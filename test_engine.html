@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mupal Madness — A0</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 24px;
+      line-height: 1.4;
+      background: #f7f7f7;
+    }
+
+    h1, h2, h3 {
+      margin-bottom: 8px;
+    }
+
+    .section {
+      margin-bottom: 24px;
+      padding: 18px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background: #fcfcfc;
+    }
+
+    .app-header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 20px 16px;
+      border: 1px solid #d6e4f0;
+      border-radius: 14px;
+      background: linear-gradient(to bottom, #f7fbff, #eef6ff);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .app-title {
+      margin: 0;
+      font-size: 2rem;
+      color: #1a365d;
+    }
+
+    .app-subtitle {
+      margin-top: 8px;
+      font-size: 1rem;
+      color: #4a5568;
+    }
+
+    .center-screen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 70vh;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 14px 22px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      background: #2b6cb0;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.92;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .option-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+      margin-bottom: 12px;
+    }
+
+    .choice-button {
+      margin-top: 0;
+      background: #e2e8f0;
+      color: #1a202c;
+      border: 2px solid transparent;
+    }
+
+    .choice-button.selected {
+      background: #bee3f8;
+      border-color: #2b6cb0;
+      color: #1a365d;
+    }
+
+    .small-text {
+      font-size: 0.95rem;
+      color: #4a5568;
+    }
+
+    .screen-card {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .screen-title {
+      margin-top: 0;
+      color: #1a365d;
+    }
+
+    .screen-subtitle {
+      color: #4a5568;
+      margin-bottom: 20px;
+    }
+
+    .selection-group {
+      margin-bottom: 24px;
+    }
+
+    .selection-label {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #2d3748;
+    }
+
+    .status-box {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: #edf2f7;
+      color: #2d3748;
+    }
+
+    .error-box {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: #fff5f5;
+      color: #c53030;
+      border: 1px solid #feb2b2;
+    }
+
+    .trial-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .population-group {
+      border: 1px solid #d6d6d6;
+      border-radius: 12px;
+      padding: 16px;
+      background: #f8fafc;
+    }
+
+    .group-title {
+      margin-top: 0;
+      margin-bottom: 12px;
+      color: #1a365d;
+    }
+
+    .mupal-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .mupal-card {
+      width: 170px;
+      padding: 12px;
+      border: 1px solid #d6d6d6;
+      border-radius: 12px;
+      background: white;
+      text-align: center;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .mupal-card.survivor {
+      border: 2px solid #38a169;
+      background: #f0fff4;
+      box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.12);
+    }
+
+    .mupal-card.eliminated {
+      opacity: 0.45;
+      filter: grayscale(0.35);
+      background: #f7f7f7;
+    }
+
+    .mupal-badge {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 2px 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      border-radius: 999px;
+    }
+
+    .badge-survivor {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+
+    .badge-eliminated {
+      background: #edf2f7;
+      color: #4a5568;
+    }
+
+    .mupal-stage {
+      position: relative;
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 8px auto;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+    }
+
+    .mupal-stage img {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+
+    .score-line {
+      font-size: 0.92rem;
+      margin: 2px 0;
+      color: #2d3748;
+    }
+
+    .results-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+      margin-bottom: 18px;
+    }
+
+    .summary-box {
+      padding: 14px;
+      border-radius: 10px;
+      background: #edf2f7;
+      text-align: center;
+      border: 1px solid #d6d6d6;
+    }
+
+    .summary-number {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #1a365d;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 800px) {
+      .results-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .mupal-card {
+        width: 150px;
+      }
+    }
+@media (max-width: 700px) {
+  body {
+    margin: 12px;
+  }
+
+  .app-header {
+    padding: 16px 12px;
+    margin-bottom: 16px;
+  }
+
+  .app-title {
+    font-size: 1.6rem;
+  }
+
+  .app-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .section {
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+
+  .screen-card {
+    max-width: 100%;
+  }
+
+  .center-screen {
+    height: auto;
+    min-height: 65vh;
+    padding: 12px;
+  }
+
+  .option-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .option-row button,
+  .button-row button,
+  button {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .button-row {
+    flex-direction: column;
+  }
+
+  .mupal-row {
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .mupal-card {
+    width: 135px;
+    padding: 10px;
+  }
+
+  .mupal-stage {
+    width: 90px;
+    height: 90px;
+  }
+
+  .score-line {
+    font-size: 0.82rem;
+  }
+
+  .results-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-box {
+    padding: 12px;
+  }
+
+  .summary-number {
+    font-size: 1.5rem;
+  }
+
+  .summary-table th,
+  .summary-table td {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+
+  .dice-screen {
+    min-height: 300px;
+  }
+
+  .dice-icon {
+    font-size: 4rem;
+  }
+
+  .dice-text {
+    font-size: 1rem;
+  }
+
+  .logo-corner {
+    width: 180px;
+    bottom: 12px;
+    right: 12px;
+    opacity: 0.82;
+  }
+}
+
+.dice-screen {
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.dice-icon {
+  font-size: 5rem;
+  animation: diceBounce 0.7s ease-in-out infinite;
+}
+
+.dice-text {
+  margin-top: 16px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #1a365d;
+}
+
+@keyframes diceBounce {
+  0% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-8px) rotate(-8deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(-6px) rotate(8deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+.summary-table-wrap {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border: 1px solid #d6d6d6;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.summary-table th,
+.summary-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.summary-table th {
+  background: #edf2f7;
+  color: #1a365d;
+  font-weight: bold;
+}
+
+.summary-table tr:last-child td {
+  border-bottom: none;
+}
+
+.summary-highlight {
+  font-weight: bold;
+  background: #f0fff4;
+  color: #22543d;
+}
+
+.summary-environment {
+  font-weight: bold;
+  color: #2d3748;
+}
+
+.summary-prediction {
+  color: #1a365d;
+}
+.logo-corner {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 360px;
+  opacity: 0.9;
+  animation: fadeInLogo 0.8s ease-out;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes fadeInLogo {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 0.9;
+    transform: translateY(0);
+  }
+}
+  </style>
+</head>
+
+<body>
+  <div class="app-header">
+    <h1 class="app-title">Mupal Madness! Simplified Natural Selection</h1>
+    <div class="app-subtitle">Investigate how environmental conditions affect one trait.</div>
+  </div>
+
+  <div id="output"></div>
+
+  <script src="mupal_engine.vA0.js"></script>
+
+  <script>
+    let currentScreen = "landing";
+let selectedEnvironment = null;
+let selectedPrediction = null;
+let currentTrialResult = null;
+let completedTrials = [];
+let currentPopulation = [];
+let scoresRolled = false;
+let isRolling = false;
+let awaitingResultsReveal = false;
+
+    function renderScreen() {
+      const output = document.getElementById("output");
+
+      if (!window.MupalEngineVA0) {
+        output.innerHTML = `
+          <div class="screen-card section">
+            <h2 class="screen-title">Engine Not Loaded</h2>
+            <div class="error-box">
+              The A0 engine did not load. Check that the script filename and path are correct.
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      if (currentScreen === "landing") {
+        output.innerHTML = `
+          <div class="center-screen fade-in-up">
+            <button onclick="goToConcept()">Start Simulation</button>
+          </div>
+        <img src="assets/logo/TLL_Color.png" class="logo-corner" alt="Lesson Laboratory logo" />
+  `;
+        return;
+      }
+
+      if (currentScreen === "concept") {
+        output.innerHTML = `
+          <div class="screen-card section fade-in-up">
+            <h2 class="screen-title">Environment Matters</h2>
+            <p>Different ear sizes may help Mupals survive in different temperatures.</p>
+            <button onclick="goToTrialSetup()">Continue</button>
+          </div>
+        `;
+        return;
+      }
+
+      if (currentScreen === "trialSetup") {
+        output.innerHTML = `
+          <div class="screen-card section fade-in-up">
+            <h2 class="screen-title">Set Up Trial</h2>
+            <p class="screen-subtitle">Choose an environment and make a prediction.</p>
+
+            <div class="selection-group">
+              <div class="selection-label">Environment</div>
+              <div class="option-row">
+                <button class="choice-button ${selectedEnvironment === "cold" ? "selected" : ""}" onclick="selectEnvironment('cold')">Cold</button>
+                <button class="choice-button ${selectedEnvironment === "temperate" ? "selected" : ""}" onclick="selectEnvironment('temperate')">Temperate</button>
+                <button class="choice-button ${selectedEnvironment === "hot" ? "selected" : ""}" onclick="selectEnvironment('hot')">Hot</button>
+              </div>
+            </div>
+
+            <div class="selection-group">
+              <div class="selection-label">Which ear size will survive best in this environment?</div>
+              <div class="option-row">
+  <button class="choice-button ${selectedPrediction === "large" ? "selected" : ""}" onclick="selectPrediction('large')">Large ears</button>
+  <button class="choice-button ${selectedPrediction === "small" ? "selected" : ""}" onclick="selectPrediction('small')">Small ears</button>
+  <button class="choice-button ${selectedPrediction === "medium" ? "selected" : ""}" onclick="selectPrediction('medium')">Medium ears</button>
+</div>
+            </div>
+
+            <div class="status-box">
+              <div><strong>Selected Environment:</strong> ${selectedEnvironment ? capitalize(selectedEnvironment) : "None yet"}</div>
+              <div><strong>Your Prediction:</strong> ${selectedPrediction ? capitalize(selectedPrediction) + " ears" : "None yet"}</div>
+            </div>
+
+            <button onclick="runTrialFromSetup()" ${(!selectedEnvironment || !selectedPrediction) ? "disabled" : ""}>Run Trial</button>
+          </div>
+        `;
+        return;
+      }
+
+      if (currentScreen === "trialExecution") {
+  output.innerHTML = `
+    <div class="screen-card section fade-in-up">
+      <h2 class="screen-title">Trial in Progress</h2>
+      <p class="screen-subtitle">Environment: ${capitalize(selectedEnvironment)}</p>
+
+      <div class="status-box">
+        <div><strong>Your Prediction:</strong> ${capitalize(selectedPrediction)} ears</div>
+      </div>
+
+      ${
+        !scoresRolled && !isRolling
+          ? `
+            <div class="trial-grid">
+              ${renderPopulationGroup("small", "Small ears", false, false)}
+              ${renderPopulationGroup("medium", "Medium ears", false, false)}
+              ${renderPopulationGroup("large", "Large ears", false, false)}
+            </div>
+            <button onclick="rollScoresForCurrentTrial()">Roll Scores</button>
+          `
+          : ""
+      }
+
+      ${
+        isRolling
+          ? `
+            <div class="dice-screen">
+              <div class="dice-icon">🎲</div>
+              <div class="dice-text">Rolling scores...</div>
+            </div>
+          `
+          : ""
+      }
+
+      ${
+        awaitingResultsReveal && !isRolling
+          ? `
+            <div class="dice-screen">
+              <div class="dice-icon">🎲</div>
+              <div class="dice-text">Scores are ready.</div>
+              <button onclick="goToTrialResults()">View Results</button>
+            </div>
+          `
+          : ""
+      }
+    </div>
+  `;
+  return;
+}
+
+      if (currentScreen === "trialResults") {
+        output.innerHTML = `
+          <div class="screen-card section fade-in-up">
+            <h2 class="screen-title">Trial Results</h2>
+            <p class="screen-subtitle">Environment: ${capitalize(currentTrialResult.environment)}</p>
+
+            <div class="status-box">
+              <div><strong>Your Prediction:</strong> ${capitalize(currentTrialResult.prediction)} ears</div>
+            </div>
+
+            <div class="results-summary">
+              <div class="summary-box">
+                <div>Small ears</div>
+                <div class="summary-number">${currentTrialResult.survivors.small}</div>
+                <div class="small-text">survivors</div>
+              </div>
+              <div class="summary-box">
+                <div>Medium ears</div>
+                <div class="summary-number">${currentTrialResult.survivors.medium}</div>
+                <div class="small-text">survivors</div>
+              </div>
+              <div class="summary-box">
+                <div>Large ears</div>
+                <div class="summary-number">${currentTrialResult.survivors.large}</div>
+                <div class="small-text">survivors</div>
+              </div>
+            </div>
+
+            <p>Some ear types appear more often among the survivors.</p>
+
+            <div class="trial-grid">
+              ${renderPopulationGroup("small", "Small ears", true)}
+${renderPopulationGroup("medium", "Medium ears", true)}
+${renderPopulationGroup("large", "Large ears", true)}
+            </div>
+
+            <div class="button-row">
+              <button onclick="goToTrialSetup()">Run Another Trial</button>
+              <button onclick="goToSummary()">View Summary</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      if (currentScreen === "summary") {
+  output.innerHTML = `
+    <div class="screen-card section fade-in-up">
+      <h2 class="screen-title">Final Comparison Summary</h2>
+      <p class="screen-subtitle">Compare results across all completed trials.</p>
+
+      <div class="status-box">
+        <div><strong>Completed Trials:</strong> ${completedTrials.length}</div>
+      </div>
+
+      ${renderSummaryTable()}
+
+      <p class="small-text">Some ear types appear more often among the survivors in certain environments.</p>
+
+      <div class="button-row">
+        <button onclick="goToTrialSetup()">Run More Trials</button>
+        <button onclick="restartSimulation()">Restart Simulation</button>
+      </div>
+    </div>
+  `;
+  return;
+}
+    }
+
+    function goToConcept() {
+      currentScreen = "concept";
+      renderScreen();
+    }
+
+    function goToTrialSetup() {
+  currentScreen = "trialSetup";
+  currentTrialResult = null;
+  currentPopulation = [];
+  scoresRolled = false;
+  isRolling = false;
+  awaitingResultsReveal = false;
+  renderScreen();
+}
+
+    function selectEnvironment(environment) {
+      selectedEnvironment = environment;
+      renderScreen();
+    }
+
+    function selectPrediction(prediction) {
+      selectedPrediction = prediction;
+      renderScreen();
+    }
+
+    function runTrialFromSetup() {
+  try {
+    currentPopulation = window.MupalEngineVA0.generatePopulation();
+    currentTrialResult = null;
+    scoresRolled = false;
+    isRolling = false;
+    currentScreen = "trialExecution";
+    renderScreen();
+  } catch (error) {
+    const output = document.getElementById("output");
+    output.innerHTML = `
+      <div class="screen-card section">
+        <h2 class="screen-title">Trial Error</h2>
+        <div class="error-box">${error.message}</div>
+      </div>
+    `;
+    console.error(error);
+  }
+}
+
+function rollScoresForCurrentTrial() {
+  try {
+    isRolling = true;
+    scoresRolled = false;
+    awaitingResultsReveal = false;
+    renderScreen();
+
+    setTimeout(() => {
+      currentTrialResult = window.MupalEngineVA0.runTrial(selectedEnvironment, selectedPrediction);
+      completedTrials.push(window.MupalEngineVA0.createSummaryRow(currentTrialResult));
+      currentPopulation = currentTrialResult.population;
+      isRolling = false;
+      scoresRolled = true;
+      awaitingResultsReveal = true;
+      renderScreen();
+    }, 900);
+  } catch (error) {
+    const output = document.getElementById("output");
+    output.innerHTML = `
+      <div class="screen-card section">
+        <h2 class="screen-title">Trial Error</h2>
+        <div class="error-box">${error.message}</div>
+      </div>
+    `;
+    console.error(error);
+  }
+}
+
+    function goToTrialResults() {
+  awaitingResultsReveal = false;
+  currentScreen = "trialResults";
+  renderScreen();
+}
+
+    function goToSummary() {
+  currentScreen = "summary";
+  renderScreen();
+}
+
+    function restartSimulation() {
+  currentScreen = "landing";
+  selectedEnvironment = null;
+  selectedPrediction = null;
+  currentTrialResult = null;
+  completedTrials = [];
+  currentPopulation = [];
+  scoresRolled = false;
+  isRolling = false;
+  awaitingResultsReveal = false;
+  renderScreen();
+}
+
+    function capitalize(value) {
+      if (!value) return "";
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+
+    function getEarImagePath(mupal) {
+      return `assets/ears/${mupal.asset}.png`;
+    }
+
+    function getBodyImagePath() {
+      return `assets/body/mupal_body.png`;
+    }
+
+function renderPopulationGroup(earType, title, revealResults = false, showScores = true) {
+  const sourcePopulation = currentTrialResult ? currentTrialResult.population : currentPopulation;
+  const filtered = sourcePopulation.filter((mupal) => mupal.earType === earType);
+
+  return `
+    <div class="population-group">
+      <h3 class="group-title">${title}</h3>
+      <div class="mupal-row">
+        ${filtered.map((mupal) => renderMupalCard(mupal, revealResults, showScores)).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderMupalCard(mupal, revealResults = false, showScores = true) {
+  const statusClass = revealResults
+    ? (mupal.survived ? "survivor" : "eliminated")
+    : "";
+
+  const badgeHtml = revealResults
+    ? `<div class="mupal-badge ${mupal.survived ? "badge-survivor" : "badge-eliminated"}">
+         ${mupal.survived ? "Survivor" : "Eliminated"}
+       </div>`
+    : "";
+
+  const scoreHtml = showScores
+    ? `
+      <div class="score-line">Base Roll: ${mupal.baseRoll}</div>
+      <div class="score-line">Modifier: ${mupal.modifier > 0 ? "+" : ""}${mupal.modifier}</div>
+      <div class="score-line">Final Score: ${mupal.finalScore}</div>
+    `
+    : `
+      <div class="score-line">Base Roll: ?</div>
+      <div class="score-line">Modifier: ?</div>
+      <div class="score-line">Final Score: ?</div>
+    `;
+
+  return `
+    <div class="mupal-card ${statusClass}">
+      <div class="mupal-stage">
+        <img src="${getBodyImagePath()}" alt="Mupal body" />
+        <img src="${getEarImagePath(mupal)}" alt="${mupal.label}" />
+      </div>
+
+      <div><strong>${mupal.label}</strong></div>
+      ${scoreHtml}
+      ${badgeHtml}
+    </div>
+  `;
+}
+function renderSummaryTable() {
+  if (!completedTrials.length) {
+    return `
+      <div class="status-box">
+        No trials completed yet.
+      </div>
+    `;
+  }
+
+  return `
+    <div class="summary-table-wrap">
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Trial</th>
+            <th>Environment</th>
+            <th>Prediction</th>
+            <th>Small</th>
+            <th>Medium</th>
+            <th>Large</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${completedTrials.map((trial, index) => renderSummaryRow(trial, index)).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderSummaryRow(trial, index) {
+  const maxValue = Math.max(trial.small, trial.medium, trial.large);
+
+  return `
+    <tr>
+      <td>${index + 1}</td>
+      <td class="summary-environment">${capitalize(trial.environment)}</td>
+      <td class="summary-prediction">${capitalize(trial.prediction)} ears</td>
+      <td class="${trial.small === maxValue ? "summary-highlight" : ""}">${trial.small}</td>
+      <td class="${trial.medium === maxValue ? "summary-highlight" : ""}">${trial.medium}</td>
+      <td class="${trial.large === maxValue ? "summary-highlight" : ""}">${trial.large}</td>
+    </tr>
+  `;
+}
+function createSummaryRow(trialResult) {
+  return {
+    environment: trialResult.environment,
+    prediction: trialResult.prediction,
+    small: trialResult.survivors.small,
+    medium: trialResult.survivors.medium,
+    large: trialResult.survivors.large,
+  };
+}
+    renderScreen();
+  </script>
+</body>
+</html>
